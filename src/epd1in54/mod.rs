@@ -13,14 +13,13 @@
 //!# let expectations = [];
 //!# let mut spi = spi::Mock::new(&expectations);
 //!# let expectations = [];
-//!# let cs_pin = pin::Mock::new(&expectations);
 //!# let busy_in = pin::Mock::new(&expectations);
 //!# let dc = pin::Mock::new(&expectations);
 //!# let rst = pin::Mock::new(&expectations);
 //!# let mut delay = delay::MockNoop::new();
 //!
 //!// Setup EPD
-//!let mut epd = Epd1in54::new(&mut spi, cs_pin, busy_in, dc, rst, &mut delay)?;
+//!let mut epd = Epd1in54::new(&mut spi, busy_in, dc, rst, &mut delay)?;
 //!
 //!// Use display graphics from embedded-graphics
 //!let mut display = Display1in54::default();
@@ -75,19 +74,18 @@ pub mod graphics;
 pub use crate::epd1in54::graphics::Display1in54;
 
 /// Epd1in54 driver
-pub struct Epd1in54<SPI, CS, BUSY, DC, RST, DELAY> {
+pub struct Epd1in54<SPI, BUSY, DC, RST, DELAY> {
     /// SPI
-    interface: DisplayInterface<SPI, CS, BUSY, DC, RST, DELAY>,
+    interface: DisplayInterface<SPI, BUSY, DC, RST, DELAY>,
     /// Color
     background_color: Color,
     /// Refresh LUT
     refresh: RefreshLut,
 }
 
-impl<SPI, CS, BUSY, DC, RST, DELAY> Epd1in54<SPI, CS, BUSY, DC, RST, DELAY>
+impl<SPI, BUSY, DC, RST, DELAY> Epd1in54<SPI, BUSY, DC, RST, DELAY>
 where
     SPI: Write<u8>,
-    CS: OutputPin,
     BUSY: InputPin,
     DC: OutputPin,
     RST: OutputPin,
@@ -139,11 +137,10 @@ where
     }
 }
 
-impl<SPI, CS, BUSY, DC, RST, E, DELAY> WaveshareDisplay<SPI, CS, BUSY, DC, RST, DELAY>
-    for Epd1in54<SPI, CS, BUSY, DC, RST, DELAY>
+impl<SPI, BUSY, DC, RST, E, DELAY> WaveshareDisplay<SPI, BUSY, DC, RST, DELAY>
+    for Epd1in54<SPI, BUSY, DC, RST, DELAY>
 where
     SPI: Write<u8, Error = E>,
-    CS: OutputPin,
     BUSY: InputPin,
     DC: OutputPin,
     RST: OutputPin,
@@ -160,13 +157,12 @@ where
 
     fn new(
         spi: &mut SPI,
-        cs: CS,
         busy: BUSY,
         dc: DC,
         rst: RST,
         delay: &mut DELAY,
     ) -> Result<Self, SPI::Error> {
-        let interface = DisplayInterface::new(cs, busy, dc, rst);
+        let interface = DisplayInterface::new(busy, dc, rst);
 
         let mut epd = Epd1in54 {
             interface,
@@ -289,10 +285,9 @@ where
     }
 }
 
-impl<SPI, CS, BUSY, DC, RST, DELAY> Epd1in54<SPI, CS, BUSY, DC, RST, DELAY>
+impl<SPI, BUSY, DC, RST, DELAY> Epd1in54<SPI, BUSY, DC, RST, DELAY>
 where
     SPI: Write<u8>,
-    CS: OutputPin,
     BUSY: InputPin,
     DC: OutputPin,
     RST: OutputPin,

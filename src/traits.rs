@@ -26,10 +26,9 @@ impl Default for RefreshLut {
     }
 }
 
-pub(crate) trait InternalWiAdditions<SPI, CS, BUSY, DC, RST, DELAY>
+pub(crate) trait InternalWiAdditions<SPI, BUSY, DC, RST, DELAY>
 where
     SPI: Write<u8>,
-    CS: OutputPin,
     BUSY: InputPin,
     DC: OutputPin,
     RST: OutputPin,
@@ -49,11 +48,10 @@ where
 }
 
 /// Functions to interact with three color panels
-pub trait WaveshareThreeColorDisplay<SPI, CS, BUSY, DC, RST, DELAY>:
-    WaveshareDisplay<SPI, CS, BUSY, DC, RST, DELAY>
+pub trait WaveshareThreeColorDisplay<SPI, BUSY, DC, RST, DELAY>:
+    WaveshareDisplay<SPI, BUSY, DC, RST, DELAY>
 where
     SPI: Write<u8>,
-    CS: OutputPin,
     BUSY: InputPin,
     DC: OutputPin,
     RST: OutputPin,
@@ -99,14 +97,13 @@ where
 ///# let expectations = [];
 ///# let mut spi = spi::Mock::new(&expectations);
 ///# let expectations = [];
-///# let cs_pin = pin::Mock::new(&expectations);
 ///# let busy_in = pin::Mock::new(&expectations);
 ///# let dc = pin::Mock::new(&expectations);
 ///# let rst = pin::Mock::new(&expectations);
 ///# let mut delay = delay::MockNoop::new();
 ///
 ///// Setup EPD
-///let mut epd = Epd4in2::new(&mut spi, cs_pin, busy_in, dc, rst, &mut delay)?;
+///let mut epd = Epd4in2::new(&mut spi, busy_in, dc, rst, &mut delay)?;
 ///
 ///// Use display graphics from embedded-graphics
 ///let mut display = Display4in2::default();
@@ -126,10 +123,9 @@ where
 ///# Ok(())
 ///# }
 ///```
-pub trait WaveshareDisplay<SPI, CS, BUSY, DC, RST, DELAY>
+pub trait WaveshareDisplay<SPI, BUSY, DC, RST, DELAY>
 where
     SPI: Write<u8>,
-    CS: OutputPin,
     BUSY: InputPin,
     DC: OutputPin,
     RST: OutputPin,
@@ -137,12 +133,11 @@ where
 {
     /// The Color Type used by the Display
     type DisplayColor;
-    /// Creates a new driver from a SPI peripheral, CS Pin, Busy InputPin, DC
+    /// Creates a new driver from a SPI peripheral, Busy InputPin, DC
     ///
     /// This already initialises the device.
     fn new(
         spi: &mut SPI,
-        cs: CS,
         busy: BUSY,
         dc: DC,
         rst: RST,
@@ -257,14 +252,13 @@ where
 ///# let expectations = [];
 ///# let mut spi = spi::Mock::new(&expectations);
 ///# let expectations = [];
-///# let cs_pin = pin::Mock::new(&expectations);
 ///# let busy_in = pin::Mock::new(&expectations);
 ///# let dc = pin::Mock::new(&expectations);
 ///# let rst = pin::Mock::new(&expectations);
 ///# let mut delay = delay::MockNoop::new();
 ///#
 ///# // Setup EPD
-///# let mut epd = Epd4in2::new(&mut spi, cs_pin, busy_in, dc, rst, &mut delay)?;
+///# let mut epd = Epd4in2::new(&mut spi, busy_in, dc, rst, &mut delay)?;
 ///let (x, y, frame_width, frame_height) = (20, 40, 80,80);
 ///
 ///let mut buffer = [DEFAULT_BACKGROUND_COLOR.get_byte_value(); 80 / 8 * 80];
@@ -281,10 +275,9 @@ where
 ///# Ok(())
 ///# }
 ///```
-pub trait QuickRefresh<SPI, CS, BUSY, DC, RST, DELAY>
+pub trait QuickRefresh<SPI, BUSY, DC, RST, DELAY>
 where
     SPI: Write<u8>,
-    CS: OutputPin,
     BUSY: InputPin,
     DC: OutputPin,
     RST: OutputPin,
